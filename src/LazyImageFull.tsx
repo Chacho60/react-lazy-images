@@ -163,8 +163,10 @@ const getLoadingCmd = (
   loadingPromise.promise
     .then(_res => instance.update(Action.LoadSuccess({})))
     .catch(e => {
-      // If the Loading Promise was canceled, it means we have stopped
-      // loading due to unmount, rather than an error.
+      console.warn(e);
+
+      // // If the Loading Promise was canceled, it means we have stopped
+      // // loading due to unmount, rather than an error.
       if (!e.isCanceled) {
         // TODO: think more about the error here
         instance.update(Action.LoadError({ msg: "Failed to load" }));
@@ -391,7 +393,7 @@ const loadImage = (
 
     image.onload = resolve;
     image.onerror = event =>
-      resolve(new Error(`Failed to load image in conversation`));
+      reject(new Error("Failed to load image in conversation"));
   });
 
 /** Promise that resolves after a specified number of ms */
@@ -414,9 +416,13 @@ const makeCancelable = (promise: Promise<any>): CancelablePromise => {
   let hasCanceled_ = false;
 
   const wrappedPromise = new Promise((resolve, reject) => {
-    promise.then((val: any) =>
-      hasCanceled_ ? reject({ isCanceled: true }) : resolve(val)
-    );
+    promise
+      .then((val: any) =>
+        hasCanceled_ ? reject({ isCanceled: true }) : resolve(val)
+      )
+      .catch((e: any) => {
+        hasCanceled_ ? reject({ isCanceled: true }) : reject(e);
+      });
     promise.catch((error: any) =>
       hasCanceled_ ? reject({ isCanceled: true }) : reject(error)
     );
