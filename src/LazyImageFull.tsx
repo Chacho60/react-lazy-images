@@ -391,7 +391,7 @@ const loadImage = (
 
     image.onload = resolve;
     image.onerror = event =>
-      resolve(console.warn(`Failed to load image in conversation`));
+      resolve(new Error(`Failed to load image in conversation`));
   });
 
 /** Promise that resolves after a specified number of ms */
