@@ -390,7 +390,7 @@ const loadImage = (
     }
 
     image.onload = resolve;
-    image.onerror = event => reject(new Error(`Failed to load: ${src}`));
+    image.onerror = event => reject(new Error(`Failed to load image`));
   });
 
 /** Promise that resolves after a specified number of ms */
@@ -413,12 +413,11 @@ const makeCancelable = (promise: Promise<any>): CancelablePromise => {
   let hasCanceled_ = false;
 
   const wrappedPromise = new Promise((resolve, reject) => {
-    promise.then(
-      (val: any) => (hasCanceled_ ? reject({ isCanceled: true }) : resolve(val))
+    promise.then((val: any) =>
+      hasCanceled_ ? reject({ isCanceled: true }) : resolve(val)
     );
-    promise.catch(
-      (error: any) =>
-        hasCanceled_ ? reject({ isCanceled: true }) : reject(error)
+    promise.catch((error: any) =>
+      hasCanceled_ ? reject({ isCanceled: true }) : reject(error)
     );
   });
 
